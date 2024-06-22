@@ -1,5 +1,6 @@
 package com.example.todolist.pages
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,7 @@ import com.example.todolist.Data.Todo
 import com.example.todolist.MainViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
+
 
 @Composable
 fun HomePage(viewModel: MainViewModel) {
@@ -51,12 +54,13 @@ fun HomePage(viewModel: MainViewModel) {
             topAppBar(title = "TODo List")
         }
     ) {
-        LaunchedEffect(Unit) {
-            myRef.get().addOnSuccessListener {docs->
+        LaunchedEffect(Unit){
+            myRef.get().addOnSuccessListener {
                 val todoList = arrayListOf<Todo>()
-                val documents =docs.children
-                for (document in documents){
+                val documents = it.children
+                for(document in documents ){
                     val todo = Todo(
+                        id = document.key.toString(),
                         title = document.child("title").value.toString(),
                         description = document.child("description").value.toString()
                     )
@@ -87,7 +91,7 @@ fun TodoItem(todo: Todo, viewModel: MainViewModel) {
     var check by remember {
         mutableStateOf(false)
     }
-
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,7 +134,14 @@ fun TodoItem(todo: Todo, viewModel: MainViewModel) {
                     contentDescription = "Edit Icon"
                     )
                 Spacer(modifier = Modifier.width(4.dp))
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon", modifier = Modifier.clickable {
+                    myRef.child(todo.id).removeValue().addOnSuccessListener {
+                        Toast.makeText(context, "Deleted A todo", Toast.LENGTH_SHORT).show()
+                    }
+                        .addOnFailureListener{
+                            Toast.makeText(context, "Failed to delete a todo", Toast.LENGTH_SHORT).show()
+                        }
+                })
             }
         }
 

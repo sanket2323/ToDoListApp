@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.todolist.Composables.topAppBar
 import com.example.todolist.Data.NavItem
 import com.example.todolist.pages.AccountPage
@@ -26,6 +27,9 @@ import com.example.todolist.pages.HomePage
 
 @Composable
 fun MainScreen(modifier: Modifier = Modifier,mainViewModel: MainViewModel){
+
+
+
 
     var navItemList = listOf(
         NavItem("Home", Icons.Default.Home),

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -33,9 +34,10 @@ import com.example.todolist.MainViewModel
 import com.google.android.gms.common.data.DataBufferSafeParcelable.addValue
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
+import java.util.UUID
 
 @Composable
-fun AccountPage(viewModel: MainViewModel){
+fun AccountPage(viewModel: MainViewModel) {
 
     var todoName by remember {
         mutableStateOf("")
@@ -47,7 +49,7 @@ fun AccountPage(viewModel: MainViewModel){
     val database = Firebase.database
     val myRef = database.getReference("Tasks")
     val context = LocalContext.current
-
+    var uniqueID = UUID.randomUUID().toString()
     Scaffold(
         topBar = {
             topAppBar(title = "Add ToDo")
@@ -73,43 +75,33 @@ fun AccountPage(viewModel: MainViewModel){
                     .padding(6.dp, 0.dp)
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                Button(
-                    onClick = {
-                            if (todoName.isNotEmpty() && todoDescription.isNotEmpty()){
-                                val todoInfo = Todo(todoName,todoDescription)
-                                myRef.child(todoName).setValue(todoInfo ).addOnSuccessListener {
-                                    Toast.makeText(context,"Data added successfully",Toast.LENGTH_SHORT).show()
-                                    todoName = ""
-                                    todoDescription=""
-                                }.addOnFailureListener {
-                                    Toast.makeText(context,"Failed to add data",Toast.LENGTH_SHORT).show()
-                                    println(it.message.toString())
-                                }
-                            }else{
-                                Toast.makeText(context,"Please fill all the fields",Toast.LENGTH_SHORT).show()
-                            }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF6650a4),
-                    )
-                ) {
-                    Text(text = "Add")
-                }
-                Button(
-                    onClick = {
 
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF6650a4),
-                    )
-                ) {
-                    Text(text = "Cancel")
-                }
+            Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally).size(120.dp,40.dp),
+                onClick = {
+                    if (todoName.isNotEmpty() && todoDescription.isNotEmpty()) {
+                        val todoInfo = Todo(uniqueID, todoName, todoDescription)
+                        myRef.child(todoName).setValue(todoInfo).addOnSuccessListener {
+                            Toast.makeText(context, "Data added successfully", Toast.LENGTH_SHORT)
+                                .show()
+                            todoName = ""
+                            todoDescription = ""
+                        }.addOnFailureListener {
+                            Toast.makeText(context, "Failed to add data", Toast.LENGTH_SHORT).show()
+                            println(it.message.toString())
+                        }
+                    } else {
+                        Toast.makeText(context, "Please fill all the fields", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF6650a4),
+                )
+            ) {
+                Text(text = "Add")
             }
+
         }
     }
 }
